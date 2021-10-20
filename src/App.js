@@ -1,26 +1,56 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import axios from 'axios';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+const API = 'https://api.hgbrasil.com/weather?woeid=455960&format=json-colors&locale=pt'
+
+export default class App extends React.Component {
+  state = {
+    city: '',
+    forecast:[],
+  };
+  componentDidMount() {
+    axios.get(API)
+      .then(({data})=>{
+        this.setState({
+          city: data.results.city_name,
+          forecast: data.results.forecast
+        });
+      });
+  }
+  render() {
+   return (
+    <div className="container">
+      <h1>{this.state.city}</h1>
+      <table className="striped centered">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Max.</th>
+            <th>Min.</th>
+            <th>Previsão</th>
+            <th>img</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            this.state.forecast.map(day => {
+              return (
+                <tr key={day.date}>
+                  <td>{day.date}</td>
+                  <td>{day.min}</td>
+                  <td>{day.max}</td>
+                  <td>{day.description}</td>
+                  <td><img
+                        src={`/weather-icons/${day.condition}.svg`}
+                        alt={day.condition}/>
+                  </td>
+                </tr>
+              );
+            })
+          }
+        </tbody>
+      </table>
     </div>
-  );
+    );   
+  }
 }
-
-export default App;
